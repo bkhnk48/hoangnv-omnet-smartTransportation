@@ -1,0 +1,90 @@
+file 53038 1669346225                                           
+version 3
+run General-0-20221125-10:15:56-2610
+attr configname General
+attr datetime 20221125-10:15:56
+attr datetimef 20221125-101556
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network myHospitalNetwork
+attr processid 2610
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config debug-on-errors true
+config image-path ../../../../../inet4.4/images:../../../../../veins-veins-5.2/images
+config cmdenv-express-mode true
+config cmdenv-autoflush true
+config cmdenv-status-frequency 0.1s
+config **.cmdenv-log-level info
+config ned-path .
+config image-path ../../images
+config network myHospitalNetwork
+config debug-on-errors true
+config print-undisposed false
+config sim-time-limit 3600s
+config **.scalar-recording true
+config **.vector-recording true
+config *.playgroundSizeX 2500m
+config *.playgroundSizeY 2500m
+config *.playgroundSizeZ 50m
+config *.annotations.draw true
+config *.manager.updateInterval 0.1s
+config *.manager.host "\"localhost\""
+config *.manager.port 9999
+config *.manager.autoShutdown true
+config *.manager.launchConfig "xmldoc(\"vd013.launchd.xml\")"
+config *.manager.moduleType "\"agv=org.car2x.veins.nodes.Car pedestrian=lab001.veins_inet.IPerson\""
+config *.manager.moduleName "\"agv=node pedestrian=personNode\""
+config *.manager.moduleDisplayString "\"agv='i=veins/node/car;is=vs' pedestrian='i=veins/node/pedestrian;is=vs'\""
+config *.rsu[0].mobility.x 300
+config *.rsu[0].mobility.y 300
+config *.rsu[0].mobility.z 3
+config *.rsu[*].applType "\"HospitalControlApp\""
+config *.rsu[*].appl.headerLength "80 bit"
+config *.rsu[*].appl.sendBeacons false
+config *.rsu[*].appl.dataOnSch false
+config *.rsu[*].nic.phy80211p.antennaOffsetZ "0 m"
+config *.connectionManager.sendDirect true
+config *.connectionManager.maxInterfDist 2600m
+config *.connectionManager.drawMaxIntfDist false
+config *.**.nic.mac1609_4.useServiceChannel true
+config *.**.nic.mac1609_4.txPower 20mW
+config *.**.nic.mac1609_4.bitrate 6Mbps
+config *.**.nic.phy80211p.minPowerLevel -110dBm
+config *.**.nic.phy80211p.useNoiseFloor true
+config *.**.nic.phy80211p.noiseFloor -98dBm
+config *.**.nic.phy80211p.decider "xmldoc(\"config.xml\")"
+config *.**.nic.phy80211p.analogueModels "xmldoc(\"config.xml\")"
+config *.**.nic.phy80211p.usePropagationDelay true
+config *.**.nic.phy80211p.antenna "xmldoc(\"antenna.xml\", \"/root/Antenna[@id='monopole']\")"
+config *.node[*].nic.phy80211p.antennaOffsetY "0 m"
+config *.node[*].nic.phy80211p.antennaOffsetZ "1.895 m"
+config *.node[*].applType "\"AGVControlApp\""
+config *.node[*].appl.headerLength "80 bit"
+config *.node[*].appl.sendBeacons false
+config *.node[*].appl.dataOnSch true
+config *.node[*].appl.beaconInterval 0.1s
+config *.node[*].veinsmobility.x 0
+config *.node[*].veinsmobility.y 0
+config *.node[*].veinsmobility.z 0
+config *.node[*].veinsmobility.setHostSpeed false
+config *.node[*0].veinsmobility.accidentCount 0
+
+vector 0 myHospitalNetwork.node[0].veinsmobility posx ETV
+vector 1 myHospitalNetwork.node[0].veinsmobility posy ETV
+vector 2 myHospitalNetwork.node[0].veinsmobility speed ETV
+vector 3 myHospitalNetwork.node[0].veinsmobility acceleration ETV
+vector 4 myHospitalNetwork.node[0].veinsmobility co2emission ETV
+0	3305 10125 273 24548 9.1 53 440 576.44068299022 636.255 264543.17732159 159118635.30723
+1	13430 10375 273 24548 9.1 53 440 110.9 185.9 63311.492904805 9524917.7608801
+2	23805 11260 278 24548 9.2 53 439 0 3.6533090671873 1294.7629105349 4692.2005272686
+3	35065 6405 340 24548 9.3 53 438 -10 10 17.533090671873 1453.3741852319
+4	41470 11567 340 24548 9.3 53 438 0.973 9.2255118198106 591.31632367223 1130.7057106393
+
