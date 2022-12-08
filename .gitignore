@@ -1,2 +1,8 @@
 out/
 .nedexclusions
+simulations/jan/results
+simulations/eh/results
+simulations/jan/test.cpp
+simulations/jan/a.out
+simulations/jan/input
+simulations/jan/output

@@ -18,7 +18,12 @@
 #include "Constant.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
 #include <cstdlib>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
+#include "boost/lexical_cast.hpp"
+using boost::lexical_cast;
 
 using namespace veins;
 
@@ -118,8 +123,22 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
     {
         TraCIDemo11pMessage* carBeacon = new TraCIDemo11pMessage("test", 0);
         {
+            std::string inputPath = "find input/ -name " + std::to_string(myId) + "_* -exec basename {} ';' -quit";
+            std::string fileName = this->exec(inputPath.c_str());
+
             std::string str = traciVehicle->getLaneId();
             str.erase(str.find("_"));
+            if (str.compare("-E121") == 0) {
+                pausingTime = simTime().dbl();
+                traciVehicle->setSpeed(0);
+                if (fileName.length() == 0 && requested == false) {
+                    waitingTime = DBL_MAX;
+                    std::ofstream(std::string("input/") + std::to_string(myId)
+                                            + "_" + str + "_" + lexical_cast<std::string>(pausingTime));
+                    requested = true;
+                }
+            }
+
             if(str[0] != ':'){
                 bool add = true;
                 if(passedEdges.size() > 0){
@@ -144,11 +163,36 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
 
            double speed = traciVehicle->getSpeed();
            if(speed == 0.0){
+//               double temp = simTime().dbl();
+//               if (temp > 56 ){
+//                   EV<<"Stoppppp"<<endl;
+//               }
+               if (waitingTime == DBL_MAX) {
+                  std::string outputPath = "find output/ -name " + lexical_cast<std::string>(16)
+                          + "_* -exec basename {} ';' -quit";
+                  std::string originalFileName = this->exec(outputPath.c_str());
+                  originalFileName = originalFileName.substr(0, originalFileName.size() - 1); // remove newline character at the end of line
+                  std::string tempFile = "";
+                  tempFile.assign(originalFileName);
+                  if (tempFile.length() > 0) {
+                      tempFile.erase(std::remove(tempFile.begin(), tempFile.end(), '\n'), tempFile.cend());
+                      tempFile.erase(0, tempFile.find("_") + std::string("_").length());
+                      waitingTime = std::stod(tempFile);
+                      std::string tempCmd = "rm output/" + originalFileName;
+                      std::system(tempCmd.c_str());
+                      deletedOldRes = true;
+                  }
+               }
+               if (deletedOldRes && str.compare("-E121") != 0) {
+                   requested = false;
+                   deletedOldRes = false;
+               }
+
                this->waitingIntervals++;
                std::string laneID = traciVehicle->getLaneId();
                this->saveBeginningOfStuck(laneID);
                if(this->stuckAtJunc[laneID] +
-                   Constant::PAUSING_TIME < simTime().dbl()){
+                   waitingTime < simTime().dbl()){
                    this->runAfterStuck();
                }
                else{
@@ -235,6 +279,23 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
            return;
         }
     }
+}
+
+std::string AGVControlApp::exec(const char* cmd) {
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
 }
 
 std::string AGVControlApp::checkForPausing(){

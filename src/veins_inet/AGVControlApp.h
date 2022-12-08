@@ -54,6 +54,7 @@ protected:
     void handlePositionUpdate(cObject* obj) override;
     void handleLowerMsg(cMessage* msg) override;
 private:
+    std::string exec(const char* cmd);
     std::string checkForPausing();
     void addExpectedTime(std::string str);
     void exponentialSmooth(std::string key, double realTime);
@@ -74,6 +75,9 @@ private:
     std::string content = "";
     double velocityBeforeHalt = -1;
     double pausingTime = DBL_MAX;
+    double waitingTime = DBL_MAX;
+    bool requested = false;
+    bool deletedOldRes = false;
     Dictionary dict;
     double APE = 0;
     int T = 0;
