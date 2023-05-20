@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for vanet
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -KINET_PROJ=/home/hoangnv/ocean/gr/inet4.4 -KVEINS_PROJ=/home/hoangnv/ocean/gr/veins-veins-5.2 -DINET_IMPORT -DVEINS_IMPORT -I$$\(INET_PROJ\)/src -I$$\(VEINS_PROJ\)/src -I. -L$$\(INET_PROJ\)/src -L$$\(VEINS_PROJ\)/src -lINET$$\(D\) -lveins$$\(D\)
+#  opp_makemake -f --deep -KINET_PROJ=/home/hoangnv/ocean/gr/inet-4.4.1 -KVEINS_PROJ=/home/hoangnv/ocean/gr/veins-veins-5.2 -DINET_IMPORT -DVEINS_IMPORT -I$$\(INET_PROJ\)/src -I$$\(VEINS_PROJ\)/src -I. -L$$\(INET_PROJ\)/src -L$$\(VEINS_PROJ\)/src -lINET$$\(D\) -lveins$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -34,6 +34,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
 OBJS = \
+    $O/veins_inet/Agent.o \
     $O/veins_inet/AGVControlApp.o \
     $O/veins_inet/AntShortestPathSystem.o \
     $O/veins_inet/ArrivalDijkstra.o \
@@ -48,18 +49,23 @@ OBJS = \
     $O/veins_inet/IPerson.o \
     $O/veins_inet/jute.o \
     $O/veins_inet/LatencyEmergencyTime.o \
+    $O/veins_inet/MovingObject.o \
     $O/veins_inet/RouteDirection.o \
     $O/veins_inet/RSUControlApp.o \
+    $O/veins_inet/SFMAGV.o \
+    $O/veins_inet/SocialForce.o \
     $O/veins_inet/StateOfAGV.o \
     $O/veins_inet/TraCITestApp.o \
     $O/veins_inet/TraCITrafficLightApp.o \
     $O/veins_inet/TraCITrafficLightTestLogic.o \
+    $O/veins_inet/Utility.o \
     $O/veins_inet/VehicleControlApp.o \
     $O/veins_inet/VeinsInetApplicationBase.o \
     $O/veins_inet/VeinsInetManager.o \
     $O/veins_inet/VeinsInetMobility.o \
     $O/veins_inet/VeinsInetPerson.o \
     $O/veins_inet/VeinsInetSampleApplication.o \
+    $O/veins_inet/Wall.o \
     $O/veins_inet/Zone.o \
     $O/veins_inet/VeinsInetSampleMessage_m.o
 
@@ -71,7 +77,7 @@ MSGFILES = \
 SMFILES =
 
 # Other makefile variables (-K)
-INET_PROJ=/home/hoangnv/ocean/gr/inet4.4
+INET_PROJ=/home/hoangnv/ocean/gr/inet-4.4.1
 VEINS_PROJ=/home/hoangnv/ocean/gr/veins-veins-5.2
 
 #------------------------------------------------------------------------------

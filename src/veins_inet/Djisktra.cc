@@ -157,6 +157,7 @@ void Djisktra::getListEdges(std::string weightEdges){
         /*if(min > w){
             min = w;
         }*/
+//        std::cout << "Name: " << name << " - Weight: " << w << std::endl;
         edges.push_back(std::make_pair(name, w));
     }
     file.close();

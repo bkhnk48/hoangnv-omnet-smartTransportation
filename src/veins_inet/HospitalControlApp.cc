@@ -22,16 +22,161 @@
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <omp.h>
+#include <string>
+#include <regex>
+
 using namespace boost::algorithm;
 
 
 using namespace veins;
+
+//#include <sys/stat.h>
+//#include <fstream>
+//#include "boost/lexical_cast.hpp"
+//using boost::lexical_cast;
 
 Register_Class(HospitalControlApp);
 
 void HospitalControlApp::initialize(int stage)
 {
     TraCIDemoRSU11p::initialize(stage);
+
+    // test
+//    EV<<"1234"<<endl;
+//    std::ofstream("input/test");
+//    string path = std::string("input/") + "16" + "_" + "-E121" + "_" + lexical_cast<std::string>(30.25);
+//    int tt = std::system("find output/ -name 16_* -exec basename {} ';'");
+//    string path = "find output/ -name " + lexical_cast<std::string>(16) + "_* -exec basename {} ';' -quit";
+//    string tt = this->exec(path.c_str());
+//    tt.erase(std::remove(tt.begin(), tt.end(), '\n'), tt.cend());
+//    tt.erase(0, tt.find("_") + std::string("_").length());
+
+    // std::string laneIdsStr = "E1 E2 E3 E4 E5";
+    // float length = 15;
+    // std::vector<std::string> laneIds = split(laneIdsStr, " ");
+    // float segLength = length / laneIds.size();
+
+    // std::vector<json> rs;
+    // std::string cmdFindAGVsSameDirection = "find input/ -name ab_cd_* -exec basename {} ';'";
+    // std::string sameDirection = Utility::exec(cmdFindAGVsSameDirection.c_str());
+    // sameDirection = Utility::trim(sameDirection);
+    // std::vector<std::string> sameDList = split(sameDirection, "\n");
+    // for(size_t i = 0; i < sameDList.size(); i++) {
+    //     std::string endWithMyId = "_12";
+    //     if (sameDList[i].rfind (endWithMyId) != sameDList[i].length () - endWithMyId.length ())
+    //     {
+    //         std::vector<std::string> tokenList = split(sameDList[i], "_");
+    //         std::string inEdge = tokenList[2];
+    //         std::cout << inEdge << std::endl;
+
+    //         for (size_t j = 0; j < laneIds.size(); j++) {
+    //             if(laneIds[j].compare(inEdge) == 0) {
+    //                 float pos = j * segLength;
+    //                 rs.push_back({ { "src", 0 }, { "position", pos }, { "main", 0 } });
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
+
+    // std::string cmdFindAGVsOpDirection = "find input/ -name cd_ab_* -exec basename {} ';'";
+    // std:: string opDirection = Utility::exec(cmdFindAGVsOpDirection.c_str());
+    // opDirection = Utility::trim(opDirection);
+    // std::vector<std::string> opList = split(opDirection, "\n");
+    // for(size_t i = 0; i < opList.size(); i++) {
+    //     std::string endWithMyId = "_12";
+    //     if (opList[i].rfind (endWithMyId) != opList[i].length () - endWithMyId.length ())
+    //     {
+    //         std::vector<std::string> tokenList = split(opList[i], "_");
+    //         std::string inEdge = tokenList[2];
+
+    //         for (size_t j = 0; j < laneIds.size(); j++) {
+    //             if(laneIds[j].compare(inEdge) == 0) {
+    //                 float pos = j * segLength;
+    //                 rs.push_back({ { "src", 2 }, { "position", (laneIds.size() - 1 - j) * segLength }, { "main", 0 } });
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
+
+    // std::cout << rs[0] << std::endl;
+    // std::cout << rs[1] << std::endl;
+    // std::cout << "Hello" << std::endl;
+
+//    std::vector<json> mapData;
+//        std::vector<std::string> cyclicalData;
+//    // Read map data
+//        std::ifstream jsonFile("mapData.json");
+//        std::string fileContent((std::istreambuf_iterator<char>(jsonFile)),
+//                (std::istreambuf_iterator<char>()));
+//
+//        // Parse the string into a json object
+//        json data = json::parse(fileContent);
+//
+//        // Check if the object is an array
+//        if (data.is_array()) {
+//            // Loop through the elements of the array
+//            for (size_t i = 0; i < data.size(); i++) {
+//                // Access the element by index
+//                json element = data.at(i);
+//                mapData.push_back(element);
+//                // Do something with the element
+//    //        std::cout << "Element " << i << ": " << element.dump() << "\n";
+//            }
+//        } else {
+//            // The object is not an array
+//            std::cout << "The object is not an array.\n";
+//        }
+//
+//        // Read cyclicalData file
+//        ifstream file("cyclicalData.txt");
+//        // Check if the file is open
+//        if (file.is_open()) {
+//            // Define a string variable to store each line
+//            std::string line;
+//
+//            // Loop through each line of the file
+//            while (getline(file, line)) {
+//                // Add the line to the vector
+//                cyclicalData.push_back(trim(line));
+//            }
+//
+//            // Close the file
+//            file.close();
+//        } else {
+//            // Handle the error
+//            cout << "Unable to open file\n";
+//        }
+//
+//        std::string laneId = "E129";
+//
+//        json objectData;
+//            for (size_t i = 0; i < mapData.size(); i++) {
+//                std::string startingEdge = to_string(mapData[i]["startingEdge"]);
+//                removeChar(startingEdge, '"');
+//                if (startingEdge.compare(laneId) == 0) {
+//                    objectData = mapData[i];
+//                    break;
+//                }
+//            }
+//            std::cout << objectData << std::endl;
+//            std::string src = objectData["src"];
+//            removeChar(src, '"');
+//            std::string dest = objectData["dest"];
+//            removeChar(dest, '"');
+//            for (size_t i = 0; i < cyclicalData.size(); i++) {
+//                if (cyclicalData[i].compare(src) == 0
+//                        || cyclicalData[i].compare(dest) == 0) {
+//                    std::string length = objectData["length"];
+//                    removeChar(length, '"');
+//                    std::cout << "Length: " << stod(length) << std::endl;
+//                }
+//            }
+//            std::cout << "-2" << std::endl;
+
+    // test
+
     if(graphGenerator == NULL){
         graphGenerator = new Parser();
     }
@@ -160,6 +305,16 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
     // code for handling the message goes here, see TraciDemo11p.cc for examples
     cPacket *enc = wsm->getEncapsulatedPacket();
     if (TraCIDemo11pMessage *bc = dynamic_cast<TraCIDemo11pMessage*>(enc)) {
+        //test
+        // std::stringstream streamData(bc->getDemoData());
+        // std::string tmp;
+        // std::string str = "";
+        // while (getline(streamData, tmp))
+        //     str += tmp;
+
+        // std::cout << "==========> Ready to receive ++++++++++ " << str << std::endl;
+        //test
+
         if (sendBeacon != NULL) {
             if (sendBeacon->isScheduled()) {
                 cancelEvent(sendBeacon);
@@ -207,6 +362,8 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
             TraCIDemo11pMessage *rsuBeacon = new TraCIDemo11pMessage();
 
             char *ret = mergeContent(bc->getSenderAddress());
+
+            // std::cout << "Content: " << ret << std::endl;
             rsuBeacon->setDemoData(ret);
             rsuBeacon->setSenderAddress(myId);
             try{
@@ -220,6 +377,8 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
                 EV<<e.what()<<endl;
             }
         }
+
+        // std::cout << "HERE..." << std::endl;
 
         double t = simTime().dbl();
         if(t > 224.5){
@@ -393,6 +552,14 @@ std::string HospitalControlApp::readMessage(TraCIDemo11pMessage *bc) {
         }
     }
     newRoute = reRoute(cur, originalRouteId);
+//     if (newRoute.length() == 0) {
+// //        updateAGVSFMInfo(cur->id, cur->itinerary->prevLane);
+//         updateAGVSFMInfo(cur->id, laneId);
+//         std::cout << agvInfo.dump() << std::endl;
+//         string agvInfoString = agvInfo.dump();
+//         std::replace(agvInfoString.begin(), agvInfoString.end(), '"', '@');
+//         newRoute = "{\"agvInfo\" : \"" + agvInfoString + "\"}";
+//     }
     return newRoute;
 }
 
@@ -542,12 +709,37 @@ std::string HospitalControlApp::reRoute(AGV *cur, std::string routeId/*, double 
             weights = ", \"weights\" : " + weights;
         }
 
+    //     updateAGVSFMInfo(cur->id, cur->itinerary->prevLane);
+    //    std::cout << agvInfo.dump() << std::endl;
 
-        newRoute = "{\"id\" : \"" + cur->id +
-                "\", \"newRoute\" : \"" + newRoute + "\"" + weights + "}";
+       newRoute = "{\"id\" : \"" + cur->id +
+               "\", \"newRoute\" : \"" + newRoute + "\"" + weights + "}";
+        // string agvInfoString = agvInfo.dump();
+        // std::replace(agvInfoString.begin(), agvInfoString.end(), '"', '@');
+        // newRoute = "{\"id\" : \"" + cur->id +
+        //           "\", \"agvInfo\" : \"" + agvInfoString +
+        //           "\", \"newRoute\" : \"" + newRoute + "\"" + weights + "}";
+
         return newRoute;
     }
     return "";
+}
+
+void HospitalControlApp::updateAGVSFMInfo(string agvId, string laneId){
+    if (agvInfo[agvId] == nullptr) {
+        agvInfo[agvId] = laneId;
+    } else {
+        vector<string> tokens = Utility::splitSFM(agvInfo[agvId], " ");
+        if (tokens.size() == 2) {
+            if (laneId.compare(tokens[1]) != 0) {
+                agvInfo[agvId] = tokens[1] + " " + laneId;
+            }
+        } else {
+            string temp = agvInfo[agvId];
+            Utility::removeChar(temp, '"');
+            agvInfo[agvId] = temp + " " + laneId;
+        }
+    }
 }
 
 std::string HospitalControlApp::excludeDuplication(std::string futureLane, std::string lastRoute){

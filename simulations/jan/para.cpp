@@ -135,6 +135,7 @@ int main()
 						std::ofstream(std::string("output/") + vehicleId + "_" + waitingTimeStr);
 						cout << "1 request has been processed: ";
 						cout << vehicleId + "_" + waitingTimeStr << endl;
+						cout << "Continue run at: " + lexical_cast<std::string>(waitingTime + 57.390) << endl;
 						cout << "Waiting for new request..." << endl;
 					}
 				}

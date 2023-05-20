@@ -33,26 +33,31 @@
 //#include "DecisionDijkstra.h"
 //#include "LatencyEmergencyTime.h"
 #include "AntShortestPathSystem.h"
+#include "Utility.h"
+#include <string>
+
+#include <lib/nlohmann/json.hpp>
+using json = nlohmann::json;
+
 using namespace omnetpp;
+using namespace Utility;
 
 namespace veins {
 
-
-
-class HospitalControlApp : public TraCIDemoRSU11p {
+class HospitalControlApp: public TraCIDemoRSU11p {
 public:
     void initialize(int stage) override;
     void finish() override;
-    cMessage* sendBeacon;
-    Parser* graphGenerator;
+    cMessage *sendBeacon;
+    Parser *graphGenerator;
 
 protected:
-    void onBSM(DemoSafetyMessage* bsm) override;
-    void onWSM(BaseFrame1609_4* wsm) override;
-    void onWSA(DemoServiceAdvertisment* wsa) override;
+    void onBSM(DemoSafetyMessage *bsm) override;
+    void onWSM(BaseFrame1609_4 *wsm) override;
+    void onWSA(DemoServiceAdvertisment *wsa) override;
 
-    void handleSelfMsg(cMessage* msg) override;
-    void handlePositionUpdate(cObject* obj) override;
+    void handleSelfMsg(cMessage *msg) override;
+    void handlePositionUpdate(cObject *obj) override;
 
 private:
     std::vector<Crossing> crossings;
@@ -73,15 +78,20 @@ private:
     //double getAvailablePerdestrian(std::string crossId, double _time);
     //double getVeloOfPerdestrian(std::string crossId, double _time);
     void predictDispearTime();
-    Djisktra* djisktra;
+    Djisktra *djisktra;
     //HarmfulnessDijkstra* djisktra;
     std::string reRoute(AGV *cur, std::string routeId/*, double t*/);
     void sendToAGV(std::string content);
     std::string removeAntidromic(std::string input);
     std::vector<std::vector<int>> aroundIntersections;
     bool checkCycle(std::string route);
-    double* areas;
-    std::string excludeDuplication(std::string futureLane, std::string lastRoute);
+    double *areas;
+    std::string excludeDuplication(std::string futureLane,
+            std::string lastRoute);
+
+    // For SFM
+    void updateAGVSFMInfo(string agvId, string laneId);
+    json agvInfo;
 
 };
 }
