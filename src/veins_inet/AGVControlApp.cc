@@ -217,15 +217,15 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                 if (srcJuncSFM.compare(roadId) != 0) {
                     if (isSimulating && !isGettingEdge && destJuncSFM.compare(roadId) == 0) {
                         timeSpent = temp - timeEnterHallway;
-                        std::cout << "Spent time: " << timeSpent << std::endl;
+                        std::cout << std::to_string(myId) << " - Spent time: " << timeSpent << std::endl;
                         if (timeSpent < timeRequired) {
                             pausingTime = temp;
                             waitingTime = timeRequired - timeSpent;
-                            std::cout << "Waiting time: " << waitingTime << std::endl;
+                            std::cout << std::to_string(myId) << " - Waiting time: " << waitingTime << std::endl;
                             velocityBeforeHalt = traciVehicle->getSpeed();
 //                            traciVehicle->setSpeed(0);
                             isHalting = true;
-                            std::cout << "Stop at time: " << temp << " - Location: " << roadId << std::endl;
+                            std::cout << std::to_string(myId) << " - Stop at time: " << temp << " - Location: " << roadId << std::endl;
                         }
                         isSimulating = false;
 
@@ -238,7 +238,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                     }
                     for (size_t i = 0; i < cyclicalData.size(); i++) {
                         if (cyclicalData[i].compare(roadId) == 0) {
-                            std::cout << "===>Starting junction: " << roadId
+                            std::cout << std::to_string(myId) << " ===>Starting junction: " << roadId
                                     << std::endl;
                             srcJuncSFM = roadId;
                             timeEnterHallway = temp;
@@ -254,7 +254,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
             } else if (isGettingEdge) {
                 json hallwayCharc = getHallwayCharc(roadId);
                 isGettingEdge = false;
-                std::cout << "Starting edge: " << roadId << std::endl;
+                std::cout << std::to_string(myId) << " - Starting edge: " << roadId << std::endl;
 
                 if (hallwayCharc != nullptr) {
                     // Get dest
@@ -266,65 +266,31 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                     // Get hallway length
                     std::string lengthTemp = hallwayCharc["length"];
                     Utility::removeChar(lengthTemp, '"');
-                    float lengthTempFloat = stof(lengthTemp);
-                    float length1Side = lengthTempFloat / 2;
 
-                    juncDataGraphMode = { length1Side, length1Side };
+                    hallwayLength = stof(lengthTemp);
+
+                    // Get number of total agents
                     vector<int> minMaxAgents = Utility::getMinMaxAgents(
                             timeFrameData, 8, srcJuncSFM);
                     totalAgents = Utility::getNumTotalAgents(minMaxAgents[0],
                             minMaxAgents[1]);
 
+                    // Get all laneId in current hallway
                     std::string laneIdsStr = hallwayCharc["laneIds"];
                     Utility::removeChar(laneIdsStr, '"');
 
-                    std::vector<json> otherAGVs = getOtherAGVInfo(srcJuncSFM, destJuncSFM, laneIdsStr, lengthTempFloat);
+                    // Get all AGV information in current hallway
+                    std::vector<json> otherAGVs = getOtherAGVInfo(srcJuncSFM, destJuncSFM, laneIdsStr, hallwayLength);
 
-                    socialForce = new SocialForce;
-
-                    // Run simulation without graphics
-                    std::cout << "Running simulation without graphics"
-                            << std::endl;
-                    createWalls(socialForce, juncDataGraphMode);
-                    createAgents(socialForce, totalAgents);
                     std::vector<json> agvSrcDestCodes;
                     agvSrcDestCodes.push_back(
                             { { "src", 0 }, { "position", 0 }, { "main", 1 } });
                     if(otherAGVs.size() > 0) {
                         agvSrcDestCodes.insert (agvSrcDestCodes.end (), otherAGVs.begin (), otherAGVs.end ());
                     }
-                    createAGVs(agvSrcDestCodes);
 
-                    startTiming = chrono::high_resolution_clock::now();
-                    std::vector<SFMAGV*> agvs = socialForce->getAGVs();
-                    std::cout << "Total number of AGVs: " << agvs.size()
-                            << std::endl;
-                    string message = "AGVs are running on hallway with length "
-                            + std::to_string(juncDataGraphMode[0] * 2)
-                            + " with " + std::to_string(totalAgents)
-                            + " agents";
-                    cout << message << endl;
-
-                    for (SFMAGV *agv : agvs) {
-                        agv->setIsMoving(true);
-                        auto elapsedTime = chrono::duration_cast<
-                                chrono::milliseconds>(
-                                chrono::high_resolution_clock::now()
-                                        - startTiming);
-                        int agvStartTime = static_cast<int>(elapsedTime.count());
-                        agv->setTravelingTime(agvStartTime);
-                        agv->setPrevTime(agvStartTime);
-                    }
-
-//                    while (updateNoGraphics()) {
-//                    };
-//
-//                    for (SFMAGV *agv : agvs) {
-//                        if (agv->getMainAgv() == 1) {
-//                            timeRequired = agv->getTravelingTime() / 1000;
-//                            break;
-//                        }
-//                    }
+                    // Run simulation
+                    timeRequired = runSimulation(agvSrcDestCodes, totalAgents);
                     timeRequired = 1;
                     std::cout << "Required Time: "
                                             << timeRequired << endl;
@@ -410,7 +376,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                     this->runAfterStuck();
                     if (isHalting) {
                         isHalting = false;
-                        std::cout << "Re-run at: " << temp << std::endl;
+                        std::cout << std::to_string(myId) << " - Re-run at: " << temp << std::endl;
                     }
                 } else {
                     if (this->checkEmergencySituation()) {
@@ -510,6 +476,7 @@ std::vector<json> AGVControlApp::getOtherAGVInfo(std::string src, std::string de
     float segLength = length / laneIds.size();
     std::string endWithMyId = "_" + std::to_string(myId);
 
+    // find agvs moving in the same direction
     std::string cmdFindAGVsSameDirection = "find agv_info/ -name " + srcJuncSFM + "_" + destJuncSFM
                         + "_* -exec basename {} ';'";
     std::string sameDirection = Utility::exec(cmdFindAGVsSameDirection.c_str());
@@ -531,6 +498,7 @@ std::vector<json> AGVControlApp::getOtherAGVInfo(std::string src, std::string de
         }
     }
 
+    // find the agvs moving in the opposite direction
     std::string cmdFindAGVsOpDirection = "find agv_info/ -name " + destJuncSFM + "_" + srcJuncSFM
                         + "_* -exec basename {} ';'";
     std:: string opDirection = Utility::exec(cmdFindAGVsOpDirection.c_str());
@@ -544,7 +512,6 @@ std::vector<json> AGVControlApp::getOtherAGVInfo(std::string src, std::string de
 
             for (size_t j = 0; j < laneIds.size(); j++) {
                 if(laneIds[j].compare(inEdge) == 0) {
-                    float pos = j * segLength;
                     result.push_back({ { "src", 2 }, { "position", (laneIds.size() - 1 - j) * segLength }, { "main", 0 } });
                     break;
                 }
@@ -553,6 +520,60 @@ std::vector<json> AGVControlApp::getOtherAGVInfo(std::string src, std::string de
     }
 
     return result;
+}
+
+double AGVControlApp::runSimulation(std::vector<json> agvInfo, int totalAgents) {
+    std::cout << "Start simulation" << std::endl;
+
+    double result = -1;
+
+    socialForce = new SocialForce;
+
+    if (hallwayLength < 0) {
+        return -1;
+    }
+
+    float length1Side = hallwayLength / 2;
+    juncDataGraphMode = { length1Side, length1Side};
+
+    createWalls(socialForce, juncDataGraphMode);
+    createAgents(socialForce, totalAgents);
+    createAGVs(agvInfo);
+
+    startTiming = chrono::high_resolution_clock::now();
+    std::vector<SFMAGV*> agvs = socialForce->getAGVs();
+    std::cout << std::to_string(myId) << " - Total number of AGVs: " << agvs.size()
+            << std::endl;
+    string message = "AGVs are running on hallway with length "
+            + std::to_string(juncDataGraphMode[0] * 2)
+            + " with " + std::to_string(totalAgents)
+            + " agents";
+    cout << message << endl;
+
+    for (SFMAGV *agv : agvs) {
+        agv->setIsMoving(true);
+        auto elapsedTime = chrono::duration_cast<
+                chrono::milliseconds>(
+                chrono::high_resolution_clock::now()
+                        - startTiming);
+        int agvStartTime = static_cast<int>(elapsedTime.count());
+        agv->setTravelingTime(agvStartTime);
+        agv->setPrevTime(agvStartTime);
+    }
+
+
+    // while (updateNoGraphics()) {
+    // };
+
+    // for (SFMAGV *agv : agvs) {
+    //     if (agv->getMainAgv() == 1) {
+    //         result = agv->getTravelingTime() / 1000;
+    //         break;
+    //     }
+    // }
+
+    return result;
+
 }
 
 json AGVControlApp::getHallwayCharc(std::string laneId) {
@@ -772,7 +793,7 @@ bool AGVControlApp::updateNoGraphics() {
             }
             // count_agvs = count_agvs + 1;
             if (agv->getMainAgv() == 1) {
-                int totalRunningTime = currTime - startTime;
+                // int totalRunningTime = currTime - startTime;
 //                Utility::writeResult("end.txt", agvs, totalAgents,
 //                        totalRunningTime);
 

@@ -120,6 +120,7 @@ private:
     void getListVertices(std::string fileName);
     std::string srcJuncSFM = "#";
     std::string destJuncSFM = "#";
+    float hallwayLength = -1;
     std::string prevStartingEdge = "#";
     std::string savedEdge = "#";
     bool isGettingEdge = false;
@@ -130,6 +131,7 @@ private:
 
     json getHallwayCharc(std::string lanedId);
     std::vector<json> getOtherAGVInfo(std::string src, std::string dest, std::string laneIdsStr, float length);
+    double runSimulation(std::vector<json> agvInfo, int totalAgents);
 
     // For SFM
     SocialForce *socialForce;
