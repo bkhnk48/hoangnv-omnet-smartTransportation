@@ -11,6 +11,10 @@
     "description": "Max number of agents (uniform distribution)",
     "value": 70
   },
+  "useOldNoAgents": {
+    "description": "Use the old data about number of agents",
+    "value": 1
+  },
   "totalCrowdLength": {
     "description": "Crowd total length",
     "value": 40

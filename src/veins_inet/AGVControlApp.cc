@@ -209,6 +209,47 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                     }
                     
                     std::cout << std::to_string(myId) << " - src: " << srcJuncSFM << " curLane: " << savedEdge << " dest: " << destJuncSFM << std::endl;
+                    // Get all AGV information in current hallway
+                    if (srcJuncSFM.compare("#") != 0 && destJuncSFM.compare("#") != 0) {
+                        std::vector<std::string> laneIds = split(curLaneIds, " ");
+                        float segLength = hallwayLength / laneIds.size();
+
+                        bool needToRunSimulation = false;
+                        std::vector<json> otherAGVs = getOtherAGVInfo();
+                        for (size_t i = 0; i < otherAGVs.size(); i++) {
+                            // if (temp > 7.5) {
+                            //     std::cout << std::to_string(myId) << otherAGVs[i] << std::endl;
+                            // }
+                            if (otherAGVs[i]["position"] < segLength + 1) {
+                                needToRunSimulation = true;
+                                break;
+                            }
+                        }
+                        std::cout << "Need to run simulation: " << needToRunSimulation << std::endl;
+                        if (needToRunSimulation) {
+                            timeLastSimulation = temp;
+                            std::vector<json> agvSrcDestCodes;
+                            for (size_t j = 0; j < laneIds.size(); j++) {
+                                if(laneIds[j].compare(str) == 0) {
+                                    float pos = j * segLength;
+                                    agvSrcDestCodes.push_back({ { "src", 0 }, { "position", pos }, { "main", 1 } });
+                                    break;
+                                }
+                            }
+                            if(otherAGVs.size() > 0) {
+                                agvSrcDestCodes.insert (agvSrcDestCodes.end (), otherAGVs.begin (), otherAGVs.end ());
+                            }
+
+                            // Run simulation
+                            timeRequired = runSimulation(agvSrcDestCodes, totalAgents);
+                            // timeRequired = 1;
+                            std::cout << "++--++ Last Required Time: "
+                                                    << timeRequired << " - Last simulation: " << timeLastSimulation << endl;
+
+                            delete socialForce;
+                            socialForce = 0;
+                        }
+                    }
                 }
             }
 
@@ -216,7 +257,11 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
 //                roadId.erase(roadId.find("_"));
                 if (srcJuncSFM.compare(roadId) != 0) {
                     if (isSimulating && !isGettingEdge && destJuncSFM.compare(roadId) == 0) {
-                        timeSpent = temp - timeEnterHallway;
+                        if (fabs(timeLastSimulation - 0) > 0.01){
+                            timeSpent = temp - timeLastSimulation;
+                        } else {
+                            timeSpent = temp - timeEnterHallway;
+                        }
                         std::cout << std::to_string(myId) << " - Spent time: " << timeSpent << std::endl;
                         if (timeSpent < timeRequired) {
                             pausingTime = temp;
@@ -246,6 +291,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
 //                                    << std::endl;
                             isGettingEdge = true;
                             isSimulating = true;
+                            timeLastSimulation = 0;
                             break;
                         }
                     }
@@ -278,9 +324,10 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
                     // Get all laneId in current hallway
                     std::string laneIdsStr = hallwayCharc["laneIds"];
                     Utility::removeChar(laneIdsStr, '"');
+                    curLaneIds = laneIdsStr;
 
                     // Get all AGV information in current hallway
-                    std::vector<json> otherAGVs = getOtherAGVInfo(srcJuncSFM, destJuncSFM, laneIdsStr, hallwayLength);
+                    std::vector<json> otherAGVs = getOtherAGVInfo();
 
                     std::vector<json> agvSrcDestCodes;
                     agvSrcDestCodes.push_back(
@@ -291,7 +338,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
 
                     // Run simulation
                     timeRequired = runSimulation(agvSrcDestCodes, totalAgents);
-                    timeRequired = 1;
+                    // timeRequired = 1;
                     std::cout << "Required Time: "
                                             << timeRequired << endl;
 
@@ -468,12 +515,12 @@ void AGVControlApp::handleSelfMsg(cMessage *msg) {
     }
 }
 
-std::vector<json> AGVControlApp::getOtherAGVInfo(std::string src, std::string dest, std::string laneIdsStr, float length) {
-    std::cout << src << " " << dest << " " << laneIdsStr << " " << length << std::endl;
+std::vector<json> AGVControlApp::getOtherAGVInfo() {
+    // std::cout << srcJuncSFM << " " << destJuncSFM << " " << curLaneIds << " " << hallwayLength << std::endl;
     std::vector<json> result;
 
-    std::vector<std::string> laneIds = split(laneIdsStr, " ");
-    float segLength = length / laneIds.size();
+    std::vector<std::string> laneIds = split(curLaneIds, " ");
+    float segLength = hallwayLength / laneIds.size();
     std::string endWithMyId = "_" + std::to_string(myId);
 
     // find agvs moving in the same direction
@@ -562,15 +609,15 @@ double AGVControlApp::runSimulation(std::vector<json> agvInfo, int totalAgents) 
     }
 
 
-    // while (updateNoGraphics()) {
-    // };
+    while (updateNoGraphics()) {
+    };
 
-    // for (SFMAGV *agv : agvs) {
-    //     if (agv->getMainAgv() == 1) {
-    //         result = agv->getTravelingTime() / 1000;
-    //         break;
-    //     }
-    // }
+    for (SFMAGV *agv : agvs) {
+        if (agv->getMainAgv() == 1) {
+            result = agv->getTravelingTime() / 1000;
+            break;
+        }
+    }
 
     return result;
 

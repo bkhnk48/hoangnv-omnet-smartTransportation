@@ -121,16 +121,18 @@ private:
     std::string srcJuncSFM = "#";
     std::string destJuncSFM = "#";
     float hallwayLength = -1;
+    std::string curLaneIds = "#";
     std::string prevStartingEdge = "#";
     std::string savedEdge = "#";
     bool isGettingEdge = false;
     bool isSimulating = false;
     bool isHalting = false;
     double timeEnterHallway = 0;
+    double timeLastSimulation = 0;
     double timeSpent = 0;
 
     json getHallwayCharc(std::string lanedId);
-    std::vector<json> getOtherAGVInfo(std::string src, std::string dest, std::string laneIdsStr, float length);
+    std::vector<json> getOtherAGVInfo();
     double runSimulation(std::vector<json> agvInfo, int totalAgents);
 
     // For SFM
