@@ -62,7 +62,7 @@ namespace Utility
 
     std::string exec(const char* cmd);
 
-    std::string cmdFindFile(std::string agvId);
+    std::string cmdFindFile(std::string folderName, std::string endingStr);
 
     std::string trim(const std::string &str);
 

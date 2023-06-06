@@ -293,6 +293,9 @@ void HospitalControlApp::finish()
     EV<<"\t Global harmfulness: "<<Constant::GLOBAL_HARMFULNESS<<". ";
     EV<<"Sooner: "<<Constant::GLOBAL_SONNER<<". Later "<<Constant::GLOBAL_LATER<<endl;
     // statistics recording goes here
+
+    std::string cmdRemoveFile = "rm agv_info/*";
+    std::system(cmdRemoveFile.c_str());
 }
 
 void HospitalControlApp::onBSM(DemoSafetyMessage* bsm)

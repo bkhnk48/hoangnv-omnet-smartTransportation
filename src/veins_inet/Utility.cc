@@ -871,8 +871,8 @@ std::string Utility::exec(const char *cmd) {
     return result;
 }
 
-std::string Utility::cmdFindFile(std::string agvId) {
-        std::string cmdFindFile = "find agv_info/ -name *_" + agvId + " -exec basename {} ';' -quit";
+std::string Utility::cmdFindFile(std::string folderName, std::string endingStr) {
+        std::string cmdFindFile = "find " + folderName +"/ -name *_" + endingStr + " -exec basename {} ';' -quit";
         std::string fileName = exec(cmdFindFile.c_str());
         return trim(fileName);
     }
