@@ -238,9 +238,9 @@ void AGVControlApp::handleSelfMsg(cMessage *msg)
                         std::system(cmdRenameFile.c_str());
                     }
 
-                    std::cout << std::to_string(myId) << " - src: "
-                              << srcJuncSFM << " curLane: " << savedEdge
-                              << " dest: " << destJuncSFM << std::endl;
+                    // std::cout << std::to_string(myId) << " - src: "
+                    //           << srcJuncSFM << " curLane: " << savedEdge
+                    //           << " dest: " << destJuncSFM << std::endl;
                     // Get all AGV information in current hallway
                     if (srcJuncSFM.compare("#") != 0 && destJuncSFM.compare("#") != 0)
                     {
@@ -261,8 +261,8 @@ void AGVControlApp::handleSelfMsg(cMessage *msg)
                                 break;
                             }
                         }
-                        std::cout << "Need to run simulation: "
-                                  << needToRunSimulation << std::endl;
+//                        std::cout << "Need to run simulation: "
+//                                  << needToRunSimulation << std::endl;
                         if (needToRunSimulation)
                         {
                             timeLastSimulation = temp;
@@ -285,7 +285,7 @@ void AGVControlApp::handleSelfMsg(cMessage *msg)
                             // Run simulation
                             timeRequired = runSimulation(agvSrcDestCodes,
                                                          totalAgents);
-                            timeRequired = 1;
+                            // timeRequired = 1;
                             std::cout << "++--++ Last Required Time: "
                                       << timeRequired << " - Last simulation: "
                                       << timeLastSimulation << endl;
@@ -445,7 +445,9 @@ void AGVControlApp::handleSelfMsg(cMessage *msg)
 
                     // Run simulation
                     timeRequired = runSimulation(agvSrcDestCodes, totalAgents);
-                    timeRequired = 1;
+                    std::ofstream(
+                                std::string("traveling_time/") + srcJuncSFM + "_" + destJuncSFM + "_" + std::to_string(timeRequired));
+                    // timeRequired = 1;
                     std::cout << "Required Time: " << timeRequired << endl;
 
                     delete socialForce;
@@ -739,18 +741,18 @@ double AGVControlApp::runSimulation(std::vector<json> agvInfo,
         agv->setPrevTime(agvStartTime);
     }
 
-    // while (updateNoGraphics())
-    // {
-    // };
+    while (updateNoGraphics())
+    {
+    };
 
-    // for (SFMAGV *agv : agvs)
-    // {
-    //     if (agv->getMainAgv() == 1)
-    //     {
-    //         result = agv->getTravelingTime() / 1000;
-    //         break;
-    //     }
-    // }
+    for (SFMAGV *agv : agvs)
+    {
+        if (agv->getMainAgv() == 1)
+        {
+            result = agv->getTravelingTime() / 1000;
+            break;
+        }
+    }
 
     return result;
 }

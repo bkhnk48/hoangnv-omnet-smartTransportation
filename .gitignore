@@ -8,3 +8,4 @@ simulations/jan/input
 simulations/jan/output
 .vscode
 agv_info/
+agent_data/

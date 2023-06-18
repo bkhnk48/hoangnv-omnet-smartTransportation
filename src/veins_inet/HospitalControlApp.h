@@ -93,6 +93,8 @@ private:
     void updateAGVSFMInfo(string agvId, string laneId);
     json agvInfo;
 
+    std::vector<std::vector<std::string>> divideByAnyPrefix (const std::vector<std::string>& v);
+
 };
 }
 #endif /* VEINS_INET_HOSPITALCONTROLAPP_H_ */
