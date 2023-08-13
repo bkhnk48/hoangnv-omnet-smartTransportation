@@ -219,7 +219,7 @@ void HospitalControlApp::initialize(int stage)
         djisktra = // new LatencyEmergencyTime();
             //                new AntShortestPathSystem();
             // new DecisionDijkstra();
-            // new HarmfulnessDijkstra();
+//             new HarmfulnessDijkstra();
             // new ArrivalDijkstra();
             new Djisktra();
         this->readCrossing();

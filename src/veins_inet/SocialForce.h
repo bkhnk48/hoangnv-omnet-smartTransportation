@@ -18,6 +18,7 @@
 
 #include "Agent.h"
 #include "Wall.h"
+#include "Utility.h"
 #include <vector>
 #include <algorithm>
 #include <map>

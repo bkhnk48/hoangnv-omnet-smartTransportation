@@ -1,6 +1,7 @@
 #include "SocialForce.h"
 
 using namespace std;
+using namespace Utility;
 
 SocialForce::~SocialForce()
 {
@@ -104,6 +105,7 @@ void SocialForce::moveAGVs(float stepTime)
                 agvsPosition.push_back(pair.second);
             }
             agv->move(stepTime, agentsPosition, agvsPosition);
+            Utility::updateAGVPoints(agv);
         }
     }
 }

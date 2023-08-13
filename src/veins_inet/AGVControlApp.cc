@@ -728,11 +728,12 @@ double AGVControlApp::runSimulation(std::vector<json> agvInfo,
     std::vector<SFMAGV *> agvs = socialForce->getAGVs();
     std::cout << std::to_string(myId) << " - Total number of AGVs: "
               << agvs.size() << std::endl;
-    string message = "AGVs are running on hallway with length " + std::to_string(juncDataGraphMode[0] * 2) + " with " + std::to_string(totalAgents) + " agents";
+    string message = "AGVs are running on hallway with length " + std::to_string(juncDataGraphMode[0] * 2) + " with " + std::to_string(totalAgents) + " pedestrians";
     cout << message << endl;
 
     for (SFMAGV *agv : agvs)
     {
+        Utility::updateAGVPoints(agv);
         agv->setIsMoving(true);
         auto elapsedTime = chrono::duration_cast<chrono::milliseconds>(
             chrono::high_resolution_clock::now() - startTiming);

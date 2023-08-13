@@ -54,6 +54,8 @@ namespace Utility
 
     int getNumAGVCompleted(std::vector<SFMAGV *> agvs);
 
+    void updateAGVPoints(SFMAGV *agv);
+
     int getNumTotalAgents(int min, int max);
 
     int randomInt(int from, int to);
